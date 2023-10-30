@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+	<property name="dist.dir" location="dist"/>
+	<property name="src" value="src"/>
+	<property name="buildDir" value="bin"/>
+	<property name="stagingDir" value="staging"/>
+	<property name="windowsExtDir" value="C:/ProgramData/MIM/extensions"/>
+	
+	<property file="../../sampleWorkspace/common/antHelper.properties"/>
+	<property file="${jarPropsLoc}extHelperJars.properties"/>
+
+	<basename property="jarNameNew" file="."/>
+	
+	<path id="build.path">
+		<pathelement path="${java.class.path}"/>
+		<fileset dir="lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${baseJarDir}">
+			<include name="**/mim_extend.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="clean">
+		<echo>Cleaning ${jarNameNew}</echo> 
+		<delete dir="${buildDir}"/>
+		<delete dir="${dist.dir}"/>
+	</target>
+	
+	<target name="copyResources">
+		<copy todir="bin" file="../../sampleWorkspace/common/buildHelpers/log4j.properties"/>
+		<mkdir dir="resources"/>
+	    <copy todir="${stagingDir}">
+			<fileset dir="resources"/>	
+		</copy>
+		<copy todir="${stagingDir}/lib">
+			<fileset dir="lib"/>	
+		</copy>
+	</target>
+	
+	<target name="jar" depends="compile,copyResources,generateManifest">
+		<mkdir dir="${stagingDir}"/>
+		<delete dir="${stagingDir}" includes="${jarNameNew}.zip" includeemptydirs="true"/>
+		<delete dir="${stagingDir}" includes="ext.jar" includeemptydirs="true"/>
+		<jar jarfile="${stagingDir}/ext.jar">
+			<fileset dir="bin"/>
+		</jar>
+		<zip destfile="${dist.dir}/${jarNameNew}.zip">
+			<fileset dir="${stagingDir}"/>
+		</zip>
+		<delete dir="${stagingDir}"/>
+	</target>
+	
+	<target name="compile">
+		<mkdir dir="${buildDir}"/>
+		<mkdir dir="lib"/>
+		<javac srcdir="${src}" destdir="${buildDir}" debug="true" includeantruntime="false" fork="true" target="1.8" source="1.8">
+			<classpath>
+				<path refid="build.path"/>
+			</classpath>
+		</javac>
+	</target>
+
+	
+	<target name="generateManifest">
+		<java classname="com.mimvista.extensions.ExtensionManifestGenerator" fork="true" failonerror="true">
+			<arg value="./src"/>
+			<arg value="${buildDir}"/>
+			<arg value="${stagingDir}"/>
+			<classpath>
+				<pathelement path="${buildDir}"/>
+				<fileset dir="./lib/" includes="**.*"/>
+				<pathelement location="../../sampleWorkspace/common/buildHelpers/extHelper.jar"/>
+				<fileset dir="${baseJarDir}" includes="${requiredHelperJars}"/>
+			</classpath>
+		</java>
+	</target>
+	
+	<target name="installExtension" depends="jar">
+		<echo>Installing extension...</echo>
+		
+		<java dir="." classname="com.mimvista.extensions.PathFinder" fork="true" failonerror="false">
+			<arg value="${dist.dir}/${jarNameNew}.zip"/>
+			<classpath>
+				<pathelement location="../../sampleWorkspace/common/buildHelpers/extHelper.jar"/>
+				<pathelement location="../../sampleWorkspace/common/buildHelpers/matlabExtensionBuilder.jar"/>
+				<fileset dir="${baseJarDir}" includes="${requiredHelperJars}"/>
+			</classpath>
+		</java>
+	</target>
+	
+	<target name="installExtensionM" depends="nonJavaCompile">
+	</target>
+	
+	<target name="nonJavaCompile">
+		<java dir="." classname="com.mimvista.building.BuilderM" fork="true">
+			<arg value="nogui"/>
+			<classpath>
+				<pathelement location="../../sampleWorkspace/common/buildHelpers/matlabExtensionBuilder.jar"/>
+				<fileset dir="${baseJarDir}" includes="${requiredHelperJars}"/>
+			</classpath>
+		</java>
+	</target>
+</project>

@@ -1,0 +1,4 @@
+autocontouring/resources/
+autocontouring/dist/
+autocontouring/lib/tensorflow_jni.dll
+.metadata/.log
