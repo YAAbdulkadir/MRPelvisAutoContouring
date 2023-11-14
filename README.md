@@ -19,4 +19,4 @@ If you use the models trained using [`VNET`](https://ieeexplore.ieee.org/abstrac
 > **F. Milletari, N. Navab and S. -A. Ahmadi, "V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation," 2016 Fourth International Conference on 3D Vision (3DV), Stanford, CA, USA, 2016, pp. 565-571, doi: 10.1109/3DV.2016.79.**
 
 ## Contacts
-If you have any questions or suggestions, please contact me at Yaabdulkadir@gmail.com
+If you have any questions or suggestions, please contact me at Yasinaabdulkadir@gmail.com
